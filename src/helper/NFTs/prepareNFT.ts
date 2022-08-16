@@ -2,7 +2,7 @@ import * as CardanoWasm from '@emurgo/cardano-serialization-lib-nodejs';
 
 
 export const prepareNFT = (
-    signKey: CardanoWasm.PrivateKey,
+    policyKey: CardanoWasm.PrivateKey,
     policyTTL: number,                          // Timelock for policy
     assetName: string,                          // example = "asdNFT5"
     assetDescription: string,                   // example = "some descr this is a new nft with same policy"
@@ -19,13 +19,13 @@ export const prepareNFT = (
     // Create the policy
     const policy = 
     {
-      privateKey: signKey, // policy key
+      privateKey: policyKey, // policy key
       ttl: policyTTL, // policy ttl
     }
 
 
     // Create the policy from public key of private key
-    const policyPubKey = signKey.to_public();
+    const policyPubKey = policyKey.to_public();
 
 
     // Derive private key to policy key address

@@ -2,7 +2,7 @@
 exports.__esModule = true;
 exports.prepareNFT = void 0;
 var CardanoWasm = require("@emurgo/cardano-serialization-lib-nodejs");
-var prepareNFT = function (signKey, policyTTL, // Timelock for policy
+var prepareNFT = function (policyKey, policyTTL, // Timelock for policy
 assetName, // example = "asdNFT5"
 assetDescription, // example = "some descr this is a new nft with same policy"
 assetURL, // ipfs url address of the media (example format = ipfs://QmNhmDPJMgdsFRM9HyiQEJqrKkpsWFshqES8mPaiFRq9Zk)
@@ -10,11 +10,11 @@ mediaType) {
     var _a, _b;
     // Create the policy
     var policy = {
-        privateKey: signKey,
+        privateKey: policyKey,
         ttl: policyTTL
     };
     // Create the policy from public key of private key
-    var policyPubKey = signKey.to_public();
+    var policyPubKey = policyKey.to_public();
     // Derive private key to policy key address
     var policyAddr = CardanoWasm.BaseAddress["new"](CardanoWasm.NetworkInfo.testnet().network_id(), CardanoWasm.StakeCredential.from_keyhash(policyPubKey.hash()), CardanoWasm.StakeCredential.from_keyhash(policyPubKey.hash())).to_address();
     // Convert to policy key hash

@@ -1,3 +1,4 @@
+import * as CardanoWasm from '@emurgo/cardano-serialization-lib-nodejs';
 import {
     BlockFrostAPI,
     BlockfrostServerError,
@@ -23,17 +24,33 @@ const client = new BlockFrostAPI({projectId: TESTNET ? "testnetByg9CqH6pKiCG8shQ
 const startMintingNFT = async (assetName: string) => {
 
     // Derive an address (this is the address where you need to send ADA in order to have UTXO to actually make the transaction)
-    const bip32PrvKey = mnemonicToPrivateKey(MNEMONIC);
-    const { signKey, address } = deriveAddressPrvKey(bip32PrvKey, TESTNET, 0);
+    //const bip32PrvKey = mnemonicToPrivateKey(MNEMONIC);
+    //const { signKey, address } = deriveAddressPrvKey(bip32PrvKey, TESTNET, 0);
 
+    const signKey = CardanoWasm.PrivateKey.from_bech32("ed25519_sk18j0a6704zyerm6dsj6p2fp8juw5m43rfgk0y84jnm7w5khs4dpqquewh43");
+    const policyPrivateKey = CardanoWasm.PrivateKey.from_bech32("ed25519_sk1q96x2g66j5g7u5wydl7kcagk0h8upxznt3gj48h6njqthkyr7faqxmnnte");
+
+
+    const publicKey = signKey.to_public();
+
+    const address = CardanoWasm.BaseAddress.new(
+        CardanoWasm.NetworkInfo.testnet().network_id(),
+        CardanoWasm.StakeCredential.from_keyhash(publicKey.hash()),
+        CardanoWasm.StakeCredential.from_keyhash(publicKey.hash())
+    ).to_address();
+
+
+    
     console.log('Using address ' + address);
   
+
+
     // Retrieve utxo for the address
     let utxo: UTXO = [];
 
     try 
     {
-      utxo = await client.addressesUtxosAll(address);
+      utxo = await client.addressesUtxosAll(address.to_bech32());
     } 
     catch (error) 
     {
@@ -101,7 +118,7 @@ const startMintingNFT = async (assetName: string) => {
       mintScript 
     } 
     = prepareNFT(
-      signKey, 
+      policyPrivateKey,
       ttl, 
       assetName, 
       "Trying to create an NFT on cardano testnet", 
@@ -118,18 +135,18 @@ const startMintingNFT = async (assetName: string) => {
     } 
     = composeNFT(  
         policyKeyHash,
-        address,
+        address.to_bech32(),
         utxo,
         protocolParameters,
         assetName,
         metadata,
         mintScript,
-        ttl,
+        ttl
     );
   
 
     // 3. SIGN NFT TRANSACTION
-    const transaction = signTransactionNFT(txUnsigned, signKey, policy, mintScript);
+    const transaction = signTransactionNFT(txUnsigned, signKey, policy);
 
 
 
@@ -168,4 +185,4 @@ const startMintingNFT = async (assetName: string) => {
 };
 
 
-startMintingNFT("testNFT")
+startMintingNFT("MaxNFT2")

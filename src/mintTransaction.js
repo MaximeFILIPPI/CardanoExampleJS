@@ -36,9 +36,9 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 exports.__esModule = true;
+var CardanoWasm = require("@emurgo/cardano-serialization-lib-nodejs");
 var blockfrost_js_1 = require("@blockfrost/blockfrost-js");
 var composeNFT_1 = require("./helper/NFTs/composeNFT");
-var keys_1 = require("./helper/keys");
 var prepareNFT_1 = require("./helper/NFTs/prepareNFT");
 var signNFT_1 = require("./helper/NFTs/signNFT");
 var TESTNET = true;
@@ -46,23 +46,25 @@ var TESTNET = true;
 var MNEMONIC = 'crouch sister metal holiday cricket credit system short cry muscle artist skill drop box spice';
 var client = new blockfrost_js_1.BlockFrostAPI({ projectId: TESTNET ? "testnetByg9CqH6pKiCG8shQuXCbXy3cpN4fzgd" : "mainnetU0WcTKq108uNZB93ctcfmEJ3jAxHY3Co", isTestnet: TESTNET });
 var startMintingNFT = function (assetName) { return __awaiter(void 0, void 0, void 0, function () {
-    var bip32PrvKey, _a, signKey, address, utxo, error_1, latestEpoch, protocolParameters, latestBlock, currentSlot, ttl, _b, policy, metadata, policyKeyHash, mintScript, _c, txHash, txUnsigned, transaction, txSize, estimatedFees, res, error_2;
-    return __generator(this, function (_d) {
-        switch (_d.label) {
+    var signKey, policyPrivateKey, publicKey, address, utxo, error_1, latestEpoch, protocolParameters, latestBlock, currentSlot, ttl, _a, policy, metadata, policyKeyHash, mintScript, _b, txHash, txUnsigned, transaction, txSize, estimatedFees, res, error_2;
+    return __generator(this, function (_c) {
+        switch (_c.label) {
             case 0:
-                bip32PrvKey = (0, keys_1.mnemonicToPrivateKey)(MNEMONIC);
-                _a = (0, keys_1.deriveAddressPrvKey)(bip32PrvKey, TESTNET, 0), signKey = _a.signKey, address = _a.address;
+                signKey = CardanoWasm.PrivateKey.from_bech32("ed25519_sk18j0a6704zyerm6dsj6p2fp8juw5m43rfgk0y84jnm7w5khs4dpqquewh43");
+                policyPrivateKey = CardanoWasm.PrivateKey.from_bech32("ed25519_sk1q96x2g66j5g7u5wydl7kcagk0h8upxznt3gj48h6njqthkyr7faqxmnnte");
+                publicKey = signKey.to_public();
+                address = CardanoWasm.BaseAddress["new"](CardanoWasm.NetworkInfo.testnet().network_id(), CardanoWasm.StakeCredential.from_keyhash(publicKey.hash()), CardanoWasm.StakeCredential.from_keyhash(publicKey.hash())).to_address();
                 console.log('Using address ' + address);
                 utxo = [];
-                _d.label = 1;
+                _c.label = 1;
             case 1:
-                _d.trys.push([1, 3, , 4]);
-                return [4 /*yield*/, client.addressesUtxosAll(address)];
+                _c.trys.push([1, 3, , 4]);
+                return [4 /*yield*/, client.addressesUtxosAll(address.to_bech32())];
             case 2:
-                utxo = _d.sent();
+                utxo = _c.sent();
                 return [3 /*break*/, 4];
             case 3:
-                error_1 = _d.sent();
+                error_1 = _c.sent();
                 if (error_1 instanceof blockfrost_js_1.BlockfrostServerError && error_1.status_code === 404) {
                     // Address derived from the seed was not used yet
                     // In this case Blockfrost API will return 404
@@ -82,19 +84,19 @@ var startMintingNFT = function (assetName) { return __awaiter(void 0, void 0, vo
                 console.log(JSON.stringify(utxo, undefined, 4));
                 return [4 /*yield*/, client.epochsLatest()];
             case 5:
-                latestEpoch = _d.sent();
+                latestEpoch = _c.sent();
                 console.log();
                 console.log('latest epoch = ' + latestEpoch.epoch);
                 console.log();
                 return [4 /*yield*/, client.epochsParameters(latestEpoch.epoch)];
             case 6:
-                protocolParameters = _d.sent();
+                protocolParameters = _c.sent();
                 console.log();
                 console.log('latest parameters utxo coin = ' + protocolParameters.coins_per_utxo_word);
                 console.log();
                 return [4 /*yield*/, client.blocksLatest()];
             case 7:
-                latestBlock = _d.sent();
+                latestBlock = _c.sent();
                 currentSlot = latestBlock.slot;
                 console.log();
                 console.log('current slot = ' + currentSlot);
@@ -103,24 +105,24 @@ var startMintingNFT = function (assetName) { return __awaiter(void 0, void 0, vo
                     throw Error('Failed to fetch slot number');
                 }
                 ttl = currentSlot + 7200;
-                _b = (0, prepareNFT_1.prepareNFT)(signKey, ttl, assetName, "Trying to create an NFT on cardano testnet", "ipfs://QmNhmDPJMgdsFRM9HyiQEJqrKkpsWFshqES8mPaiFRq9Zk", "image/jpeg"), policy = _b.policy, metadata = _b.metadata, policyKeyHash = _b.policyKeyHash, mintScript = _b.mintScript;
-                _c = (0, composeNFT_1.composeNFT)(policyKeyHash, address, utxo, protocolParameters, assetName, metadata, mintScript, ttl), txHash = _c.txHash, txUnsigned = _c.txUnsigned;
-                transaction = (0, signNFT_1.signTransactionNFT)(txUnsigned, signKey, policy, mintScript);
+                _a = (0, prepareNFT_1.prepareNFT)(policyPrivateKey, ttl, assetName, "Trying to create an NFT on cardano testnet", "ipfs://QmNhmDPJMgdsFRM9HyiQEJqrKkpsWFshqES8mPaiFRq9Zk", "image/jpeg"), policy = _a.policy, metadata = _a.metadata, policyKeyHash = _a.policyKeyHash, mintScript = _a.mintScript;
+                _b = (0, composeNFT_1.composeNFT)(policyKeyHash, address.to_bech32(), utxo, protocolParameters, assetName, metadata, mintScript, ttl), txHash = _b.txHash, txUnsigned = _b.txUnsigned;
+                transaction = (0, signNFT_1.signTransactionNFT)(txUnsigned, signKey, policy);
                 txSize = transaction.to_bytes().length;
                 estimatedFees = (protocolParameters.min_fee_b / 1000000) + (protocolParameters.min_fee_a / 1000000) * (Number(txSize));
                 console.log('estimated fees = ' + estimatedFees);
-                _d.label = 8;
+                _c.label = 8;
             case 8:
-                _d.trys.push([8, 10, , 11]);
+                _c.trys.push([8, 10, , 11]);
                 return [4 /*yield*/, client.txSubmit(transaction.to_bytes())];
             case 9:
-                res = _d.sent();
+                res = _c.sent();
                 if (res) {
                     console.log("Transaction successfully submitted: " + txHash);
                 }
                 return [3 /*break*/, 11];
             case 10:
-                error_2 = _d.sent();
+                error_2 = _c.sent();
                 // submit could fail if the transactions is rejected by cardano node
                 if (error_2 instanceof blockfrost_js_1.BlockfrostServerError && error_2.status_code === 400) {
                     console.log("Transaction " + txHash + " rejected");
@@ -136,4 +138,4 @@ var startMintingNFT = function (assetName) { return __awaiter(void 0, void 0, vo
         }
     });
 }); };
-startMintingNFT("testNFT");
+startMintingNFT("MaxNFT2");

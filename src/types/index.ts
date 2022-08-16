@@ -2,7 +2,6 @@ export type UTXO = {
       /** @description Transaction hash of the UTXO */
       tx_hash: string;
       /**
-       * @deprecated
        * @description UTXO index in the transaction
        */
       tx_index: number;
