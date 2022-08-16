@@ -2,7 +2,7 @@
 exports.__esModule = true;
 exports.prepareNFT = void 0;
 var CardanoWasm = require("@emurgo/cardano-serialization-lib-nodejs");
-var prepareNFT = function (signKey, policyTTL, // pass null here to get automatic ttl for policy
+var prepareNFT = function (signKey, policyTTL, // Timelock for policy
 assetName, // example = "asdNFT5"
 assetDescription, // example = "some descr this is a new nft with same policy"
 assetURL, // ipfs url address of the media (example format = ipfs://QmNhmDPJMgdsFRM9HyiQEJqrKkpsWFshqES8mPaiFRq9Zk)
@@ -26,7 +26,7 @@ mediaType) {
     var keyHashScript = CardanoWasm.NativeScript.new_script_pubkey(CardanoWasm.ScriptPubkey["new"](policyKeyHash));
     // Add keyhash of policy hash script to main native scripts array
     scripts.add(keyHashScript);
-    // Check policy ttl 
+    // Check policy ttl if null
     //const policyTtl = policy.ttl || policyTTL;
     console.log('POLICY_TTL: ' + policyTTL);
     // add timelock to policy so it's locked after the slot

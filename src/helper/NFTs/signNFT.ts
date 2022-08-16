@@ -13,7 +13,7 @@ export const signTransactionNFT = (
     
     //const witnesses = CardanoWasm.TransactionWitnessSet.new();
     
-    const witnesses = txUnsigned.witness_set() // NOTE - getting witnesses from the tx here
+    const witnesses = txUnsigned.witness_set() ?? CardanoWasm.TransactionWitnessSet.new() // NOTE - getting witnesses from the tx here
     
     const vkeyWitnesses = witnesses.vkeys() ?? CardanoWasm.Vkeywitnesses.new();
     
@@ -23,10 +23,6 @@ export const signTransactionNFT = (
   
     witnesses.set_vkeys(vkeyWitnesses);
   
-    //const transactionWitnessSet = txUnsigned.witness_set() // NOTE - getting witnesses from the tx here
-  
-  
-  
   
     // witnesses.set_native_scripts;
   
@@ -35,15 +31,10 @@ export const signTransactionNFT = (
     // witnessScripts.add(mintScript);
     
     // witnesses.set_native_scripts(witnessScripts);
-  
-  
-  
-  
-    //transactionWitnessSet.set_vkeys(witnesses.vkeys()!)
-  
-    //const transaction = CardanoWasm.Transaction.new(txUnsigned.body(), witnesses, txUnsigned.auxiliary_data());
-  
+    
+
     const transaction = CardanoWasm.Transaction.new(txUnsigned.body(), witnesses, txUnsigned.auxiliary_data());
   
+
     return transaction;
   };

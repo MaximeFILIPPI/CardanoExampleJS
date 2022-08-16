@@ -3,7 +3,7 @@ import * as CardanoWasm from '@emurgo/cardano-serialization-lib-nodejs';
 
 export const prepareNFT = (
     signKey: CardanoWasm.PrivateKey,
-    policyTTL: number,                   // pass null here to get automatic ttl for policy
+    policyTTL: number,                          // Timelock for policy
     assetName: string,                          // example = "asdNFT5"
     assetDescription: string,                   // example = "some descr this is a new nft with same policy"
     assetURL: string,                           // ipfs url address of the media (example format = ipfs://QmNhmDPJMgdsFRM9HyiQEJqrKkpsWFshqES8mPaiFRq9Zk)
@@ -53,9 +53,8 @@ export const prepareNFT = (
     // Add keyhash of policy hash script to main native scripts array
     scripts.add(keyHashScript);
 
-    // Check policy ttl 
+    // Check policy ttl if null
     //const policyTtl = policy.ttl || policyTTL;
-
     console.log('POLICY_TTL: ' + policyTTL);
 
 
