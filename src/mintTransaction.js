@@ -44,31 +44,23 @@ var signNFT_1 = require("./helper/NFTs/signNFT");
 var TESTNET = true;
 // BIP39 mnemonic (seed) from which we will generate address to retrieve utxo from and private key used for signing the transaction
 var MNEMONIC = 'crouch sister metal holiday cricket credit system short cry muscle artist skill drop box spice';
-var client = new blockfrost_js_1.BlockFrostAPI({ projectId: TESTNET ? "testnetByg9CqH6pKiCG8shQuXCbXy3cpN4fzgd" : "mainnetU0WcTKq108uNZB93ctcfmEJ3jAxHY3Co", isTestnet: TESTNET });
+var client = new blockfrost_js_1.BlockFrostAPI({ projectId: TESTNET ? "testnetQuSkTOc0XLpq70fRJUEM5R0PXQyVa2fr" : "mainnetU0WcTKq108uNZB93ctcfmEJ3jAxHY3Co", isTestnet: TESTNET });
 var startMintingNFT = function (assetName) { return __awaiter(void 0, void 0, void 0, function () {
-    var bip32PrvKey, cardanoKeys, signKey, policyPrivateKey, address, utxo, error_1, latestEpoch, protocolParameters, latestBlock, currentSlot, ttl, _a, policy, metadata, policyKeyHash, mintScript, _b, txHash, txUnsigned, transaction, txSize, estimatedFees, res, error_2;
+    var bip32PrvKey, cardanoKeys, signKey, policyPrivateKey, address, utxo, error_1, latestEpoch, protocolParameters, latestBlock, currentSlot, ttl, _a, policy, metadata, policyKeyHash, mintScript, _b, txHash, txUnsigned, transaction, res, error_2;
     return __generator(this, function (_c) {
         switch (_c.label) {
             case 0:
                 bip32PrvKey = (0, keys_1.mnemonicToPrivateKey)(MNEMONIC);
-                cardanoKeys = (0, keys_1.deriveAddressPrvKey)(bip32PrvKey, TESTNET, 0).cardanoKeys;
-                console.log();
-                console.log("cardano keys account private key = " + cardanoKeys.accountPrivateKey.to_bech32().toString());
-                console.log("cardano keys index 0 public = " + cardanoKeys.addrIndexPubkey.to_bech32().toString());
-                console.log("cardano keys index 0 private = " + cardanoKeys.addrIndexSignKey.to_bech32().toString());
-                console.log("cardano keys index 0 address = " + cardanoKeys.addrIndexBech32);
-                console.log();
-                signKey = cardanoKeys.addrIndexSignKey // CardanoWasm.PrivateKey.from_bech32(cardanoKeys.addrIndexSignKey.to_bech32());
-                ;
-                policyPrivateKey = cardanoKeys.addr2SignKey // CardanoWasm.PrivateKey.from_bech32(cardanoKeys.addrIndexSignKey.to_bech32());
-                ;
-                address = cardanoKeys.addrIndex.to_address();
-                console.log('Using address ' + address.to_bech32());
+                cardanoKeys = (0, keys_1.deriveAddressPrvKey)(bip32PrvKey, TESTNET, 100).cardanoKeys;
+                signKey = cardanoKeys.addr0SignKey;
+                policyPrivateKey = cardanoKeys.addrIndexSignKey;
+                address = cardanoKeys.addr0Bech32;
+                console.log('Using address ' + address);
                 utxo = [];
                 _c.label = 1;
             case 1:
                 _c.trys.push([1, 3, , 4]);
-                return [4 /*yield*/, client.addressesUtxosAll(address.to_bech32())];
+                return [4 /*yield*/, client.addressesUtxosAll(address)];
             case 2:
                 utxo = _c.sent();
                 return [3 /*break*/, 4];
@@ -115,11 +107,8 @@ var startMintingNFT = function (assetName) { return __awaiter(void 0, void 0, vo
                 }
                 ttl = currentSlot + 7200;
                 _a = (0, prepareNFT_1.prepareNFT)(policyPrivateKey, ttl, assetName, "Trying to create an NFT on cardano testnet", "ipfs://QmNhmDPJMgdsFRM9HyiQEJqrKkpsWFshqES8mPaiFRq9Zk", "image/jpeg"), policy = _a.policy, metadata = _a.metadata, policyKeyHash = _a.policyKeyHash, mintScript = _a.mintScript;
-                _b = (0, composeNFT_1.composeNFT)(policyKeyHash, address.to_bech32(), utxo, protocolParameters, assetName, metadata, mintScript, ttl), txHash = _b.txHash, txUnsigned = _b.txUnsigned;
+                _b = (0, composeNFT_1.composeNFT)(policyKeyHash, address, utxo, protocolParameters, assetName, metadata, mintScript, ttl), txHash = _b.txHash, txUnsigned = _b.txUnsigned;
                 transaction = (0, signNFT_1.signTransactionNFT)(txUnsigned, signKey, policy);
-                txSize = transaction.to_bytes().length;
-                estimatedFees = (protocolParameters.min_fee_b / 1000000) + (protocolParameters.min_fee_a / 1000000) * (Number(txSize));
-                console.log('estimated fees = ' + estimatedFees);
                 _c.label = 8;
             case 8:
                 _c.trys.push([8, 10, , 11]);
@@ -147,4 +136,4 @@ var startMintingNFT = function (assetName) { return __awaiter(void 0, void 0, vo
         }
     });
 }); };
-startMintingNFT("MaxNFT2");
+startMintingNFT("NEW_NFT");

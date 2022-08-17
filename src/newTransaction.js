@@ -47,7 +47,7 @@ var MNEMONIC = 'crouch sister metal holiday cricket credit system short cry musc
 var OUTPUT_ADDRESS = 'addr_test1qpvtnmsn3nyaqmf4h6rnnfzhjn7zqgezxzwka42vemffpl7j7t4m76efmvm7cjllcu9h3cvzca2980lr4ltwvu5n37ls70d4jh';
 // Amount sent to the recipient
 var OUTPUT_AMOUNT = '2000000'; // 2 000 000 lovelaces = 5 ADA (cannot make a transaction with NFT under 1 ADA)
-var client = new blockfrost_js_1.BlockFrostAPI({ projectId: TESTNET ? "testnetByg9CqH6pKiCG8shQuXCbXy3cpN4fzgd" : "testnetByg9CqH6pKiCG8shQuXCbXy3cpN4fzgd", isTestnet: TESTNET });
+var client = new blockfrost_js_1.BlockFrostAPI({ projectId: TESTNET ? "testnetQuSkTOc0XLpq70fRJUEM5R0PXQyVa2fr" : "mainnetU0WcTKq108uNZB93ctcfmEJ3jAxHY3Co", isTestnet: TESTNET });
 var runTransaction = function () { return __awaiter(void 0, void 0, void 0, function () {
     var bip32PrvKey, cardanoKeys, address, utxo, error_1, latestEpoch, protocolParameters, latestBlock, currentSlot, ttl, _a, txHash, txBody, transaction, txSize, estimatedFees, res, error_2;
     return __generator(this, function (_b) {

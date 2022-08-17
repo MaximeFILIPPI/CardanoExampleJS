@@ -18,14 +18,14 @@ const MNEMONIC =
 'crouch sister metal holiday cricket credit system short cry muscle artist skill drop box spice';
 
 
-const client = new BlockFrostAPI({projectId: TESTNET ? "testnetByg9CqH6pKiCG8shQuXCbXy3cpN4fzgd" : "mainnetU0WcTKq108uNZB93ctcfmEJ3jAxHY3Co", isTestnet: TESTNET});
+const client = new BlockFrostAPI({projectId: TESTNET ? "testnetQuSkTOc0XLpq70fRJUEM5R0PXQyVa2fr" : "mainnetU0WcTKq108uNZB93ctcfmEJ3jAxHY3Co", isTestnet: TESTNET});
 
 
 const startMintingNFT = async (assetName: string) => {
 
     // Derive an address (this is the address where you need to send ADA in order to have UTXO to actually make the transaction)
     const bip32PrvKey = mnemonicToPrivateKey(MNEMONIC);
-    const { cardanoKeys } = deriveAddressPrvKey(bip32PrvKey, TESTNET, 0);
+    const { cardanoKeys } = deriveAddressPrvKey(bip32PrvKey, TESTNET, 100);
 
 
     // OLD WORKING CODE from example minting
@@ -41,14 +41,13 @@ const startMintingNFT = async (assetName: string) => {
     // ).to_address();
 
 
-    const signKey = cardanoKeys.addrIndexSignKey 
-    const policyPrivateKey = cardanoKeys.addr2SignKey 
+    const signKey = cardanoKeys.addr0SignKey 
+    const policyPrivateKey = cardanoKeys.addrIndexSignKey 
 
-
-    const address = cardanoKeys.addrIndex.to_address();
+    const address = cardanoKeys.addr0Bech32;
 
     
-    console.log('Using address ' + address.to_bech32());
+    console.log('Using address ' + address);
   
 
 
@@ -57,7 +56,7 @@ const startMintingNFT = async (assetName: string) => {
 
     try 
     {
-      utxo = await client.addressesUtxosAll(address.to_bech32());
+      utxo = await client.addressesUtxosAll(address);
     } 
     catch (error) 
     {
@@ -84,17 +83,23 @@ const startMintingNFT = async (assetName: string) => {
     console.log('UTXO on '+ address);
     console.log(JSON.stringify(utxo, undefined, 4));
 
+
+
     // Get latest epoch of the Cardano Blockchain
     let latestEpoch = await client.epochsLatest()
     console.log();
     console.log('latest epoch = ' + latestEpoch.epoch);
     console.log();
 
+
+
     // Get the latest protocol parameters of the Cardano Blockchain
     let protocolParameters: ProtocolParameters = await client.epochsParameters(latestEpoch.epoch);
     console.log();
     console.log('latest parameters utxo coin = ' + protocolParameters.coins_per_utxo_word);
     console.log();
+
+
   
     // Get current blockchain slot from latest block
     let latestBlock: LatestBlock = await client.blocksLatest();
@@ -142,7 +147,7 @@ const startMintingNFT = async (assetName: string) => {
     } 
     = composeNFT(  
         policyKeyHash,
-        address.to_bech32(),
+        address,
         utxo,
         protocolParameters,
         assetName,
@@ -158,9 +163,9 @@ const startMintingNFT = async (assetName: string) => {
 
 
     // (Optional: Estimate fees)
-    const txSize = transaction.to_bytes().length;
-    const estimatedFees = (protocolParameters.min_fee_b/1000000) + (protocolParameters.min_fee_a/1000000) * (Number(txSize));
-    console.log('estimated fees = ' + estimatedFees);
+    // const txSize = transaction.to_bytes().length;
+    // const estimatedFees = (protocolParameters.min_fee_b/1000000) + (protocolParameters.min_fee_a/1000000) * (Number(txSize));
+    // console.log('estimated fees = ' + estimatedFees);
 
 
     // 4. PUSH TRANSACTION to network w/ BlockFrostSDK
@@ -192,4 +197,4 @@ const startMintingNFT = async (assetName: string) => {
 };
 
 
-startMintingNFT("MaxNFT2")
+startMintingNFT("NEW_NFT")

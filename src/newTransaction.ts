@@ -24,7 +24,7 @@ const OUTPUT_ADDRESS =
 const OUTPUT_AMOUNT = '2000000'; // 2 000 000 lovelaces = 5 ADA (cannot make a transaction with NFT under 1 ADA)
 
 
-const client = new BlockFrostAPI({projectId: TESTNET ? "testnetByg9CqH6pKiCG8shQuXCbXy3cpN4fzgd" : "testnetByg9CqH6pKiCG8shQuXCbXy3cpN4fzgd", isTestnet: TESTNET});
+const client = new BlockFrostAPI({projectId: TESTNET ? "testnetQuSkTOc0XLpq70fRJUEM5R0PXQyVa2fr" : "mainnetU0WcTKq108uNZB93ctcfmEJ3jAxHY3Co", isTestnet: TESTNET});
 
 
 
