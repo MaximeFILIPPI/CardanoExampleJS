@@ -32,8 +32,10 @@ const runTransaction = async () => {//minFeeA: number , minFeeB: number, poolDep
     
     // Derive an address (this is the address where you need to send ADA in order to have UTXO to actually make the transaction)
     const bip32PrvKey = mnemonicToPrivateKey(MNEMONIC);
-    const { signKey, address } = deriveAddressPrvKey(bip32PrvKey, TESTNET, 0);
+    const { cardanoKeys } = deriveAddressPrvKey(bip32PrvKey, TESTNET, 0);
     
+    const address = cardanoKeys.addrIndexBech32;
+
     console.log('Using address ' + address);
   
     // Retrieve utxo for the address
@@ -106,7 +108,7 @@ const runTransaction = async () => {//minFeeA: number , minFeeB: number, poolDep
   
 
     // Sign transaction
-    const transaction = signTransaction(txBody, signKey);
+    const transaction = signTransaction(txBody, cardanoKeys.addrIndexSignKey);
 
 
     // Estimate fees

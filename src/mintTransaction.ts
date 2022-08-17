@@ -24,24 +24,31 @@ const client = new BlockFrostAPI({projectId: TESTNET ? "testnetByg9CqH6pKiCG8shQ
 const startMintingNFT = async (assetName: string) => {
 
     // Derive an address (this is the address where you need to send ADA in order to have UTXO to actually make the transaction)
-    //const bip32PrvKey = mnemonicToPrivateKey(MNEMONIC);
-    //const { signKey, address } = deriveAddressPrvKey(bip32PrvKey, TESTNET, 0);
-
-    const signKey = CardanoWasm.PrivateKey.from_bech32("ed25519_sk18j0a6704zyerm6dsj6p2fp8juw5m43rfgk0y84jnm7w5khs4dpqquewh43");
-    const policyPrivateKey = CardanoWasm.PrivateKey.from_bech32("ed25519_sk1q96x2g66j5g7u5wydl7kcagk0h8upxznt3gj48h6njqthkyr7faqxmnnte");
+    const bip32PrvKey = mnemonicToPrivateKey(MNEMONIC);
+    const { cardanoKeys } = deriveAddressPrvKey(bip32PrvKey, TESTNET, 0);
 
 
-    const publicKey = signKey.to_public();
+    // OLD WORKING CODE from example minting
+    // const signKey = CardanoWasm.PrivateKey.from_bech32("ed25519_sk18j0a6704zyerm6dsj6p2fp8juw5m43rfgk0y84jnm7w5khs4dpqquewh43");
+    // const policyPrivateKey = CardanoWasm.PrivateKey.from_bech32("ed25519_sk1q96x2g66j5g7u5wydl7kcagk0h8upxznt3gj48h6njqthkyr7faqxmnnte");
 
-    const address = CardanoWasm.BaseAddress.new(
-        CardanoWasm.NetworkInfo.testnet().network_id(),
-        CardanoWasm.StakeCredential.from_keyhash(publicKey.hash()),
-        CardanoWasm.StakeCredential.from_keyhash(publicKey.hash())
-    ).to_address();
+    // const publicKey = signKey.to_public();
 
+    // const address = CardanoWasm.BaseAddress.new(
+    //     CardanoWasm.NetworkInfo.testnet().network_id(),
+    //     CardanoWasm.StakeCredential.from_keyhash(publicKey.hash()),
+    //     CardanoWasm.StakeCredential.from_keyhash(publicKey.hash())
+    // ).to_address();
+
+
+    const signKey = cardanoKeys.addrIndexSignKey 
+    const policyPrivateKey = cardanoKeys.addr2SignKey 
+
+
+    const address = cardanoKeys.addrIndex.to_address();
 
     
-    console.log('Using address ' + address);
+    console.log('Using address ' + address.to_bech32());
   
 
 

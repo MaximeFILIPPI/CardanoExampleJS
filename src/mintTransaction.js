@@ -36,9 +36,9 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 exports.__esModule = true;
-var CardanoWasm = require("@emurgo/cardano-serialization-lib-nodejs");
 var blockfrost_js_1 = require("@blockfrost/blockfrost-js");
 var composeNFT_1 = require("./helper/NFTs/composeNFT");
+var keys_1 = require("./helper/keys");
 var prepareNFT_1 = require("./helper/NFTs/prepareNFT");
 var signNFT_1 = require("./helper/NFTs/signNFT");
 var TESTNET = true;
@@ -46,15 +46,24 @@ var TESTNET = true;
 var MNEMONIC = 'crouch sister metal holiday cricket credit system short cry muscle artist skill drop box spice';
 var client = new blockfrost_js_1.BlockFrostAPI({ projectId: TESTNET ? "testnetByg9CqH6pKiCG8shQuXCbXy3cpN4fzgd" : "mainnetU0WcTKq108uNZB93ctcfmEJ3jAxHY3Co", isTestnet: TESTNET });
 var startMintingNFT = function (assetName) { return __awaiter(void 0, void 0, void 0, function () {
-    var signKey, policyPrivateKey, publicKey, address, utxo, error_1, latestEpoch, protocolParameters, latestBlock, currentSlot, ttl, _a, policy, metadata, policyKeyHash, mintScript, _b, txHash, txUnsigned, transaction, txSize, estimatedFees, res, error_2;
+    var bip32PrvKey, cardanoKeys, signKey, policyPrivateKey, address, utxo, error_1, latestEpoch, protocolParameters, latestBlock, currentSlot, ttl, _a, policy, metadata, policyKeyHash, mintScript, _b, txHash, txUnsigned, transaction, txSize, estimatedFees, res, error_2;
     return __generator(this, function (_c) {
         switch (_c.label) {
             case 0:
-                signKey = CardanoWasm.PrivateKey.from_bech32("ed25519_sk18j0a6704zyerm6dsj6p2fp8juw5m43rfgk0y84jnm7w5khs4dpqquewh43");
-                policyPrivateKey = CardanoWasm.PrivateKey.from_bech32("ed25519_sk1q96x2g66j5g7u5wydl7kcagk0h8upxznt3gj48h6njqthkyr7faqxmnnte");
-                publicKey = signKey.to_public();
-                address = CardanoWasm.BaseAddress["new"](CardanoWasm.NetworkInfo.testnet().network_id(), CardanoWasm.StakeCredential.from_keyhash(publicKey.hash()), CardanoWasm.StakeCredential.from_keyhash(publicKey.hash())).to_address();
-                console.log('Using address ' + address);
+                bip32PrvKey = (0, keys_1.mnemonicToPrivateKey)(MNEMONIC);
+                cardanoKeys = (0, keys_1.deriveAddressPrvKey)(bip32PrvKey, TESTNET, 0).cardanoKeys;
+                console.log();
+                console.log("cardano keys account private key = " + cardanoKeys.accountPrivateKey.to_bech32().toString());
+                console.log("cardano keys index 0 public = " + cardanoKeys.addrIndexPubkey.to_bech32().toString());
+                console.log("cardano keys index 0 private = " + cardanoKeys.addrIndexSignKey.to_bech32().toString());
+                console.log("cardano keys index 0 address = " + cardanoKeys.addrIndexBech32);
+                console.log();
+                signKey = cardanoKeys.addrIndexSignKey // CardanoWasm.PrivateKey.from_bech32(cardanoKeys.addrIndexSignKey.to_bech32());
+                ;
+                policyPrivateKey = cardanoKeys.addr2SignKey // CardanoWasm.PrivateKey.from_bech32(cardanoKeys.addrIndexSignKey.to_bech32());
+                ;
+                address = cardanoKeys.addrIndex.to_address();
+                console.log('Using address ' + address.to_bech32());
                 utxo = [];
                 _c.label = 1;
             case 1:

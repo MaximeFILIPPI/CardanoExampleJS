@@ -49,23 +49,24 @@ var OUTPUT_ADDRESS = 'addr_test1qpvtnmsn3nyaqmf4h6rnnfzhjn7zqgezxzwka42vemffpl7j
 var OUTPUT_AMOUNT = '2000000'; // 2 000 000 lovelaces = 5 ADA (cannot make a transaction with NFT under 1 ADA)
 var client = new blockfrost_js_1.BlockFrostAPI({ projectId: TESTNET ? "testnetByg9CqH6pKiCG8shQuXCbXy3cpN4fzgd" : "testnetByg9CqH6pKiCG8shQuXCbXy3cpN4fzgd", isTestnet: TESTNET });
 var runTransaction = function () { return __awaiter(void 0, void 0, void 0, function () {
-    var bip32PrvKey, _a, signKey, address, utxo, error_1, latestEpoch, protocolParameters, latestBlock, currentSlot, ttl, _b, txHash, txBody, transaction, txSize, estimatedFees, res, error_2;
-    return __generator(this, function (_c) {
-        switch (_c.label) {
+    var bip32PrvKey, cardanoKeys, address, utxo, error_1, latestEpoch, protocolParameters, latestBlock, currentSlot, ttl, _a, txHash, txBody, transaction, txSize, estimatedFees, res, error_2;
+    return __generator(this, function (_b) {
+        switch (_b.label) {
             case 0:
                 bip32PrvKey = (0, keys_1.mnemonicToPrivateKey)(MNEMONIC);
-                _a = (0, keys_1.deriveAddressPrvKey)(bip32PrvKey, TESTNET, 0), signKey = _a.signKey, address = _a.address;
+                cardanoKeys = (0, keys_1.deriveAddressPrvKey)(bip32PrvKey, TESTNET, 0).cardanoKeys;
+                address = cardanoKeys.addrIndexBech32;
                 console.log('Using address ' + address);
                 utxo = [];
-                _c.label = 1;
+                _b.label = 1;
             case 1:
-                _c.trys.push([1, 3, , 4]);
+                _b.trys.push([1, 3, , 4]);
                 return [4 /*yield*/, client.addressesUtxosAll(address)];
             case 2:
-                utxo = _c.sent();
+                utxo = _b.sent();
                 return [3 /*break*/, 4];
             case 3:
-                error_1 = _c.sent();
+                error_1 = _b.sent();
                 if (error_1 instanceof blockfrost_js_1.BlockfrostServerError && error_1.status_code === 404) {
                     // Address derived from the seed was not used yet
                     // In this case Blockfrost API will return 404
@@ -85,37 +86,37 @@ var runTransaction = function () { return __awaiter(void 0, void 0, void 0, func
                 console.log(JSON.stringify(utxo, undefined, 4));
                 return [4 /*yield*/, client.epochsLatest()];
             case 5:
-                latestEpoch = _c.sent();
+                latestEpoch = _b.sent();
                 console.log('latest epoch = ' + latestEpoch.epoch);
                 return [4 /*yield*/, client.epochsParameters(latestEpoch.epoch)];
             case 6:
-                protocolParameters = _c.sent();
+                protocolParameters = _b.sent();
                 console.log('latest parameters = ' + protocolParameters);
                 return [4 /*yield*/, client.blocksLatest()];
             case 7:
-                latestBlock = _c.sent();
+                latestBlock = _b.sent();
                 currentSlot = latestBlock.slot;
                 if (!currentSlot) {
                     throw Error('Failed to fetch slot number');
                 }
                 ttl = currentSlot + 7200;
-                _b = (0, composeTransaction_1.composeTransaction)(address, OUTPUT_ADDRESS, OUTPUT_AMOUNT, utxo, ttl, protocolParameters), txHash = _b.txHash, txBody = _b.txBody;
-                transaction = (0, signTransaction_1.signTransaction)(txBody, signKey);
+                _a = (0, composeTransaction_1.composeTransaction)(address, OUTPUT_ADDRESS, OUTPUT_AMOUNT, utxo, ttl, protocolParameters), txHash = _a.txHash, txBody = _a.txBody;
+                transaction = (0, signTransaction_1.signTransaction)(txBody, cardanoKeys.addrIndexSignKey);
                 txSize = transaction.to_bytes().length;
                 estimatedFees = (protocolParameters.min_fee_b / 1000000) + (protocolParameters.min_fee_a / 1000000) * (Number(txSize));
                 console.log('estimated fees = ' + estimatedFees);
-                _c.label = 8;
+                _b.label = 8;
             case 8:
-                _c.trys.push([8, 10, , 11]);
+                _b.trys.push([8, 10, , 11]);
                 return [4 /*yield*/, client.txSubmit(transaction.to_bytes())];
             case 9:
-                res = _c.sent();
+                res = _b.sent();
                 if (res) {
                     console.log("Transaction successfully submitted: " + txHash);
                 }
                 return [3 /*break*/, 11];
             case 10:
-                error_2 = _c.sent();
+                error_2 = _b.sent();
                 // submit could fail if the transactions is rejected by cardano node
                 if (error_2 instanceof blockfrost_js_1.BlockfrostServerError && error_2.status_code === 400) {
                     console.log("Transaction " + txHash + " rejected");
